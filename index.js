@@ -8,7 +8,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 app.use(express.static('public'));
 app.use(express.json({ limit: '200000kb' }));
-const whitelist = [process.env.FRONTEND_URL, 'http://localhost:8080'];
+const whitelist = [process.env.Frontend_URL, 'http://localhost:8080'];
 const options = {
   origin: (origin, callback) => {
     if (whitelist.includes(origin) || !origin) {
