@@ -7,11 +7,9 @@ class LocationService {
 
   async createLocation(data) {
     try {
-      console.log(data)
       const newLocation = await models.Location.create(data);
       return newLocation;
     } catch (error) {
-      console.log(error)
       throw boom.badImplementation('Error al crear la ubicación', error);
     }
   }
