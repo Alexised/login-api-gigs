@@ -7,7 +7,6 @@ class BitacoraService {
 
   async createBitacora(data) {
     try {
-      console.log(data);
       const newBitacora = await models.Bitacora.create(data);
       return newBitacora;
     } catch (error) {
