@@ -27,7 +27,7 @@ class UserService {
       include: ['customer']
     });
     return users.map(user => ({
-      id: user.id,
+      id: user.customer.id,
       fullName: `${user.customer.name} ${user.customer.lastName}` // Access the virtual column
     }));
   }

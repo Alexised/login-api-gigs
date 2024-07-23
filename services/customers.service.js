@@ -12,6 +12,15 @@ class CustomerService {
     return rta;
   }
 
+  async findByUserId(userId) {
+    const customer = await models.Customer.findOne({
+      where: {
+        userId: userId
+      }
+    });
+    return customer;
+  }
+  
   async findOne(id) {
     const user = await models.Customer.findByPk(id);
     if (!user) {

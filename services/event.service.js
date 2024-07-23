@@ -42,7 +42,7 @@ class EventService {
     try {
       const form = await models.Event.findOne({
         where: {
-          code: code
+          id: code
         }
       });
       if (!form) {
