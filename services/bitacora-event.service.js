@@ -11,13 +11,36 @@ class BitacoraEventService {
     const events = await models.BitacoraEvent.findAll();
     return events;
   }
-
+  async findByBitacoraId(bitacoraId) {
+    return await models.BitacoraEvent.findAll({
+      where: { bitacoraId },
+    });
+  }
+  async findByUserIdAndNameForm(customerId, nameForm) {
+    const event = await models.BitacoraEvent.findOne({
+      where: {
+        customerId,
+        nameForm,
+      },
+    });
+    return event;
+  }
   async findOneById(id) {
     const event = await models.BitacoraEvent.findByPk(id);
     if (!event) {
       throw new Error('Event not found');
     }
-    return event;
+    const transformedEvent = {
+      id: event.id,
+      name: event.nameForm,
+      fields: event.activities.map(activity => ({
+        type: activity.type,
+        label: activity.label,
+        value: activity.value
+      }))
+    };
+
+    return transformedEvent;
   }
 
   async deleteById(id) {

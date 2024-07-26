@@ -17,6 +17,7 @@ module.exports = {
       },
       locationId: {
         allowNull: false,
+        unique: true,
         type: Sequelize.INTEGER,
         references: {
           model: 'locations',

@@ -23,6 +23,19 @@ router.post('/',
   }
 );
 
+router.get('/user/:id',
+  passport.authenticate('jwt', { session: false }),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const locations = await locationService.findLocationsByUserId(id);
+      res.status(200).json(locations);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+);
+
 router.get('/',
   passport.authenticate('jwt', { session: false }),
   async (req, res) => {

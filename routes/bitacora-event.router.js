@@ -32,7 +32,7 @@ router.post('/',
         throw new Error('Bitacora not found for the given locationId');
       }
       const bitacoraId = bitacora.id;
-      
+
       // Create the new bitacora event
       const newEvent = await bitacoraEventService.createEvent({
         nameForm,
@@ -48,6 +48,32 @@ router.post('/',
   }
 );
 
+router.get('/ingreso/:id',
+  passport.authenticate('jwt', { session: false }),
+  async (req, res) => {
+    try {
+      const id = req.params.id;
+      const customer = await customerService.findByUserId(id);
+      if (!customer) {
+        throw new Error('Customer not found');
+      }
+      const customerId = customer.id;
+      const existingEvent = await bitacoraEventService.findByUserIdAndNameForm(customerId, 'ingreso de turno');
+      if (existingEvent) {
+        const bitacoraId = existingEvent.bitacoraId;
+        const bitacora = await bitacoraService.findOneById(bitacoraId);
+        if (!bitacora) {
+          throw new Error('Bitacora not found');
+        }
+        const locationId = bitacora.locationId;
+        return res.status(200).json({ exists: true, locationId });
+      }
+      res.status(200).json({ exists: false });
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+);
 router.get('/',
   passport.authenticate('jwt', { session: false }),
   async (req, res) => {
@@ -59,7 +85,18 @@ router.get('/',
     }
   }
 );
-
+router.get('/bitacora/:bitacoraId',
+  passport.authenticate('jwt', { session: false }),
+  async (req, res) => {
+    try {
+      const { bitacoraId } = req.params;
+      const events = await bitacoraEventService.findByBitacoraId(bitacoraId);
+      res.status(200).json(events);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+);
 router.get('/:id',
   passport.authenticate('jwt', { session: false }),
   async (req, res) => {

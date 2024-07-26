@@ -46,7 +46,31 @@ class LocationService {
       throw boom.badImplementation('Error al buscar la ubicación', error);
     }
   }
+  async findLocationsByUserId(userId) {
+    // Buscar el usuario por userId
+    const user = await models.User.findByPk(userId, {
+      include: ['customer']
+    });
 
+    if (!user) {
+      throw new Error('Usuario no encontrado');
+    }
+
+    const customerId = user.customer.id;
+
+    // Buscar todas las locations por customerId
+    const locations = await models.Location.findAll({
+      where: { customerId },
+      attributes: ['id', 'name', 'customerId'],
+      include: [{
+        model: models.Customer,
+        as: 'customer',
+        attributes: ['name']
+      }]
+    });
+
+    return locations;
+  }
   async deleteById(id) {
     try {
       const location = await models.Location.findOne({

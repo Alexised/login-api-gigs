@@ -54,6 +54,21 @@ class EventService {
       throw boom.badImplementation('Error al eliminar el formulario', error);
     }
   }
+  async updateEvent(id, eventData) {
+    // Encuentra el evento por ID
+    const event = await models.Event.findOne({
+      where: {
+        id: id
+      }
+    });
+    if (!event) {
+      throw new Error('Event not found');
+    }
+
+    // Actualiza el evento
+    await event.update(eventData);
+    return event;
+  }
 }
 
 module.exports = EventService;

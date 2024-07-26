@@ -41,6 +41,45 @@ class BitacoraService {
       throw boom.badImplementation('Error al buscar las bitácoras', error);
     }
   }
+  async findByUserId(userId) {
+    // Buscar el user por userId
+    const user = await models.User.findByPk(userId, {
+      include: ['customer']
+    });
+
+    if (!user) {
+      throw new Error('Usuario no encontrado');
+    }
+
+    const customerId = user.customer.id;
+
+    // Buscar todas las locations por customerId
+    const locations = await models.Location.findAll({
+      where: { customerId }
+    });
+
+    const locationIds = locations.map(location => location.id);
+
+    // Filtrar las bitácoras por locationId
+    const bitacoras = await models.Bitacora.findAll({
+      where: {
+        locationId: locationIds
+      },
+      attributes: ['id', 'name', 'locationId', 'active'],
+      include: [{
+        model: models.Location,
+        as: 'location',
+        attributes: ['name', 'customerId'],
+        include: [{
+          model: models.Customer,
+          as: 'customer',
+          attributes: ['name']
+        }]
+      }]
+    });
+
+    return bitacoras;
+  }
 
   async findOneById(id) {
     try {

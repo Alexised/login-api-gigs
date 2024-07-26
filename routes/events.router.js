@@ -3,12 +3,12 @@ const router = express.Router();
 const { createEventSchema } = require('../schemas/event.schema');
 const EventService = require('../services/event.service');
 const validationHandler = require('../middlewares/validator.handler');
-const password = require('passport');
+const passport = require('passport');
 const { checkRoles } = require('../middlewares/auth.handler');
 
 const eventService = new EventService();
 router.post('/',
-password.authenticate('jwt', {session: false}),
+  passport.authenticate('jwt', {session: false}),
 checkRoles(1),
 validationHandler(createEventSchema, 'body'),
 async (req, res) => {
@@ -22,7 +22,7 @@ async (req, res) => {
 });
 
 router.get('/',
-password.authenticate('jwt', {session: false}),
+  passport.authenticate('jwt', {session: false}),
 async (req, res) => {
   try {
     const forms = await eventService.findAll();
@@ -34,7 +34,7 @@ async (req, res) => {
 
 // Ruta para buscar un formulario por su código
 router.get('/:id',
-password.authenticate('jwt', {session: false}),
+  passport.authenticate('jwt', {session: false}),
 async (req, res) => {
   try {
     const id = req.params.id;
@@ -44,9 +44,24 @@ async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 });
+router.put('/:id',
+  passport.authenticate('jwt', { session: false }),
+  checkRoles(1),
+  validationHandler(createEventSchema, 'body'), // Usa el esquema de validación para actualización si es diferente
+  async (req, res) => {
+    try {
+      const id = req.params.id;
+      const body = req.body;
+      const updatedEvent = await eventService.updateEvent(id, body);
+      res.status(200).json(updatedEvent);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+);
 
 router.delete('/:code',
-  password.authenticate('jwt', { session: false }),
+  passport.authenticate('jwt', { session: false }),
   checkRoles(1),
   async (req, res) => {
     try {

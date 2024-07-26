@@ -34,7 +34,18 @@ router.get('/',
     }
   }
 );
-
+router.get('/user/:id',
+  passport.authenticate('jwt', { session: false }),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const bitacoras = await bitacoraService.findByUserId(id);
+      res.status(200).json(bitacoras);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+);
 router.get('/:id',
   passport.authenticate('jwt', { session: false }),
   async (req, res) => {

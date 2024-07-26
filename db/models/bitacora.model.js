@@ -1,5 +1,6 @@
 const { Model, DataTypes } = require('sequelize');
 const { LOCATION_TABLE } = require('./location.model');
+const { union } = require('lodash');
 
 const BITACORA_TABLE = 'bitacoras';
 
@@ -13,11 +14,13 @@ const BitacoraSchema = {
   name: {
     allowNull: false,
     type: DataTypes.STRING
+    
   },
   locationId: {
     field: 'locationId',
     allowNull: false,
     type: DataTypes.INTEGER,
+    unique: true,
     references: {
       model: LOCATION_TABLE,
       key: 'id'
