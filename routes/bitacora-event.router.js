@@ -74,6 +74,28 @@ router.get('/ingreso/:id',
     }
   }
 );
+
+router.get('/user/:id',
+  passport.authenticate('jwt', { session: false }),
+  async (req, res) => {
+    try {
+      const id = req.params.id;
+      const customer = await customerService.findByUserId(id);
+      if (!customer) {
+        throw new Error('Customer not found');
+      }
+      const customerId = customer.id;
+      const events = await bitacoraEventService.findByCustomerId(customerId );
+      if (events) {
+
+       res.status(200).json(events);
+      }
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+);
+
 router.get('/',
   passport.authenticate('jwt', { session: false }),
   async (req, res) => {

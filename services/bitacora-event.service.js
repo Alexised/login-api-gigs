@@ -1,6 +1,6 @@
 // services/bitacora-event.service.js
 const { models } = require('../libs/sequelize');
-
+const { Op } = require('sequelize');
 class BitacoraEventService {
   async createEvent(data) {
     const newEvent = await models.BitacoraEvent.create(data);
@@ -14,13 +14,39 @@ class BitacoraEventService {
   async findByBitacoraId(bitacoraId) {
     return await models.BitacoraEvent.findAll({
       where: { bitacoraId },
+      include: ['customer']
     });
   }
   async findByUserIdAndNameForm(customerId, nameForm) {
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999)
     const event = await models.BitacoraEvent.findOne({
       where: {
         customerId,
         nameForm,
+        creationDate: {
+          [Op.between]: [todayStart, todayEnd],
+        },
+      },
+    });
+    return event;
+  }
+
+  async findByCustomerId(customerId) {
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999)
+    const event = await models.BitacoraEvent.findAll({
+      where: {
+        customerId,
+        creationDate: {
+          [Op.between]: [todayStart, todayEnd],
+        },
       },
     });
     return event;
